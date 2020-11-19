@@ -1,53 +1,59 @@
-import React, { useState } from 'react';
+import React, { Component } from 'react';
 import './App.css';
 
-const App = () => {
+class App extends Component {
+  constructor(props) {
+    super(props);
 
-  const [playerScore, setPlayerScore] = useState(0);
-  const [questions, setQuestions] = useState([
-    {
-      question: "What animal barks?",
-      possibleAnswers: ["Dog", "Cat"],
-      rightAnswer: "Dog",
-      playerChoice: null
-    },
-    {
-      question: "What animal is more closely related to a tiger?",
-      possibleAnswers: ["Dog", "Cat"],
-      rightAnswer: "Cat",
-      playerChoice: null
-    },
-    {
-      question: "What animal is more closely related to a wolf?",
-      possibleAnswers: ["Dog", "Cat"],
-      rightAnswer: "Dog",
-      playerChoice: null
-    },
-    {
-      question: "What animal is best known for playing fetch?",
-      possibleAnswers: ["Dog", "Cat"],
-      rightAnswer: "Dog",
-      playerChoice: null
+    this.state = {
+      playerScore: 0,
+      questions: [
+        {
+          question: "What animal barks?",
+          possibleAnswers: ["Dog", "Cat"],
+          rightAnswer: "Dog",
+          playerChoice: null
+        },
+        {
+          question: "What animal is more closely related to a tiger?",
+          possibleAnswers: ["Dog", "Cat"],
+          rightAnswer: "Cat",
+          playerChoice: null
+        },
+        {
+          question: "What animal is more closely related to a wolf?",
+          possibleAnswers: ["Dog", "Cat"],
+          rightAnswer: "Dog",
+          playerChoice: null
+        },
+        {
+          question: "What animal is best known for playing fetch?",
+          possibleAnswers: ["Dog", "Cat"],
+          rightAnswer: "Dog",
+          playerChoice: null
+        }
+      ]
     }
-  ]);
-
-  let answerQuestion = (index, choice) => {
-    const answeredQuestion = questions[index];
-    answeredQuestion.playerChoice = choice;
-    const allQuestions = questions;
-    allQuestions[index] = answeredQuestion;
-    setQuestions(allQuestions);
-    updatePlayerScore();
+    this.answerQuestion = this.answerQuestion.bind(this);
   }
-  
-  const updatePlayerScore = () => {
-    const playerScore = questions.filter(q => q.rightAnswer === q.playerChoice).length;
-    setPlayerScore(playerScore);
+  answerQuestion(index, choice) {
+    const answeredQuestion = this.state.questions[index];
+    answeredQuestion.playerChoice = choice;
+    const allQuestions = this.state.questions;
+    allQuestions[index] = answeredQuestion;
+    this.setState({
+      questions: allQuestions
+    }, () => {
+      this.updatePlayerScore();
+    });
+  }
+  updatePlayerScore() {
+    const playerScore = this.state.questions.filter(q => q.rightAnswer === q.playerChoice).length;
+    this.setState({ playerScore });
     console.log("New player score:", playerScore);
   }
-  
-  const displayResult = (index) => {
-    const question = questions[index];
+  displayResult(index) {
+    const question = this.state.questions[index];
     if (!question.playerChoice) { return; }
     if (question.playerChoice === question.rightAnswer) {
         return (
@@ -63,10 +69,9 @@ const App = () => {
       );
     }
   }
-  
-  const displayQuestion = (index) => {
-    if (playerScore < index) { return; }
-    const question = questions[index];
+  displayQuestion(index) {
+    if (this.state.playerScore < index) { return; }
+    const question = this.state.questions[index];
     return (
       <div className="question-display" key={`q-${index}`}>
         <p className="question">
@@ -74,31 +79,29 @@ const App = () => {
         </p>
         <br />
         { question.possibleAnswers.map((answer, answerIndex) => (
-          <button key={`q-${index}-a-${answerIndex}`} className="question-choice" onClick={() => answerQuestion(index, answer)}>
+          <button key={`q-${index}-a-${answerIndex}`} className="question-choice" onClick={() => this.answerQuestion(index, answer)}>
             {answer}
           </button>
         ))}
         <br />
-        {displayResult(index)}
+        {this.displayResult(index)}
       </div>
     );
   }
-  
-  const renderQuestions = () => {
-    return questions.map((question, index) =>
-      displayQuestion(index)
+  renderQuestions() {
+    return this.state.questions.map((question, index) =>
+      this.displayQuestion(index)
     );
   }
-
-  answerQuestion = answerQuestion.bind(this);
-
-  return (
-    <div className="App">
-      <h1>Quiz Show!</h1>
-      <hr/>
-      {renderQuestions()}
-    </div>
-  );
+  render() {
+    return (
+      <div className="App">
+        <h1>Quiz Show!</h1>
+        <hr/>
+        {this.renderQuestions()}
+      </div>
+    );
+  }
 }
 
 export default App;
